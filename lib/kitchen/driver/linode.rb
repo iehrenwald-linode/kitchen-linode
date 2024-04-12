@@ -49,6 +49,13 @@ module Kitchen
       default_config :stackscript_id, nil
       default_config :stackscript_data, nil
       default_config :swap_size, nil
+      default_config :interfaces, [
+        {
+          "purpose" => "public",
+          "label" =>  nil,
+          "ipam_address" => nil
+        }
+      ]
       default_config :private_ip, false
       default_config :authorized_users do
         ENV["LINODE_AUTH_USERS"].to_s.split(",")
@@ -177,6 +184,13 @@ module Kitchen
           info "  type: #{config[:type]}"
           info "  tags: #{config[:tags]}"
           info "  swap_size: #{config[:swap_size]}" if config[:swap_size]
+          info "  interfaces:"
+          config[:interfaces].each do |iface|
+            info "    #{iface[:purpose]}"
+            iface.each do |iface_part, iface_value|
+              info "      #{iface_part}: #{iface_value}"
+            end
+          end
           info "  private_ip: #{config[:private_ip]}" if config[:private_ip]
           info "  stackscript_id: #{config[:stackscript_id]}" if config[:stackscript_id]
           Retryable.retryable do
@@ -189,6 +203,7 @@ module Kitchen
               stackscript_id: config[:stackscript_id],
               stackscript_data: config[:stackscript_data],
               swap_size: config[:swap_size],
+              interfaces: config[:interfaces],
               private_ip: config[:private_ip],
               root_pass: config[:password],
               authorized_keys: config[:public_key_path] ? [open(config[:public_key_path]).read.strip] : [],

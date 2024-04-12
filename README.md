@@ -53,6 +53,7 @@ For many of these, you can specify an ID number, a full name, or a partial name 
 | `public_key_path` | none | Auto inferred based on the `private_key_path` | Path to SSH public key that should be installed on the server. |
 | `disable_ssh_password` | none | `true` | When set to `true` and SSH keys are provided password auth for SSH is disabled. |
 | `api_retries` | none | `5` | How many times to retry API calls on timeouts or rate limits. |
+| `interfaces` | none | `public` | A list of network interfaces to create on the linode, conforming to acceptable API definition. |
 
 ## Usage
 
@@ -119,6 +120,26 @@ platforms:
       region: eu-central
       image: linode/ubuntu20.04
 # ...<snip>...
+```
+
+Note on `interfaces`:
+By default, a linode is created with a single network interface (eth0) which is
+assigned a public IP address.  If your test linode requires another network
+interface (eth1) to mock a backend network, you may declare it within the platform
+definition.  If you do this, you should declare _all_ network interfaces, as
+shown below.
+
+```yaml
+platforms:
+  - name: debian10
+    driver:
+      ...
+      interfaces:
+        - purpose: public
+        - purpose: vlan
+          label: myGreatVLAN
+          ipam_address: 11.22.33.44/24
+      ...
 ```
 
 ## Development
